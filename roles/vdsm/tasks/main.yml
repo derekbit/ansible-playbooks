@@ -1,127 +1,125 @@
-- hosts: 127.0.0.1
-  connection: local
-  tasks:
-    - name: Add ovirt-release43 repository
-      yum:
-        name:
-          - http://resources.ovirt.org/pub/yum-repo/ovirt-release43.rpm
-        state: latest
-        update_cache: yes
+- name: Add ovirt-release43 repository
+  yum:
+    name:
+      - http://resources.ovirt.org/pub/yum-repo/ovirt-release43.rpm
+    state: latest
+    update_cache: yes
 
-    - name: Install dependencies
-      yum:
-        name:
-          - "@Development tools"
-          - zlib-devel
-          - glib2-devel
-          - bzip2-devel
-          - libuuid-devel
-          - spice-protocol
-          - spice-server-devel
-          - usbredir-devel
-          - libaio-devel
-          - dnsmasq
-          - dnsmasq-utils
-          - python3
-          - python-docutils
-          - gtk-update-icon-cache
-          - libnl-devel
-          - libxml2-devel
-          - yajl-devel
-          - device-mapper-devel
-          - libpciaccess-devel
-          - gnutls*
-          - libxslt
-          - libnl3-devel
-          - libtirpc-devel
-          - cyrus-sasl-devel
-          - gettext-devel
-          - cyrus-sasl
-          - sanlock-devel
-        state: installed
+- name: Install dependencies
+  yum:
+    name:
+      - "@Development tools"
+      - zlib-devel
+      - glib2-devel
+      - bzip2-devel
+      - libuuid-devel
+      - spice-protocol
+      - spice-server-devel
+      - usbredir-devel
+      - libaio-devel
+      - dnsmasq
+      - dnsmasq-utils
+      - python3
+      - python-docutils
+      - gtk-update-icon-cache
+      - libnl-devel
+      - libxml2-devel
+      - yajl-devel
+      - device-mapper-devel
+      - libpciaccess-devel
+      - gnutls*
+      - libxslt
+      - libnl3-devel
+      - libtirpc-devel
+      - cyrus-sasl-devel
+      - gettext-devel
+      - cyrus-sasl
+      - sanlock-devel
+    state: installed
 
-    - name: Create directory
-      file:
-        path: "{{ lookup('env','HOME') }}/sources"
-        state: directory
+- name: Create directory
+  file:
+    path: "{{ lookup('env','HOME') }}/sources"
+    state: directory
 
-    - name: Download vdsm source codes
-      git:
-        repo: http://gerrit.ovirt.org/p/vdsm.git
-        dest: "{{ lookup('env','HOME') }}/sources/vdsm"
-        version: ovirt-4.3
+- name: Download vdsm source codes
+  git:
+    repo: http://gerrit.ovirt.org/p/vdsm.git
+    dest: "{{ lookup('env','HOME') }}/sources/vdsm"
+    version: ovirt-4.3
 
-    - name: Download virt-manager source codes
-      git:
-        repo: https://github.com/virt-manager/virt-manager.git
-        dest: "{{ lookup('env','HOME') }}/sources/virt-manager"
-        version: v3.1.0
+- name: Download virt-manager source codes
+  git:
+    repo: https://github.com/virt-manager/virt-manager.git
+    dest: "{{ lookup('env','HOME') }}/sources/virt-manager"
+    version: v3.1.0
 
-    - name: Download libvirt source codes
-      git:
-        repo: https://github.com/libvirt/libvirt.git
-        dest: "{{ lookup('env','HOME') }}/sources/libvirt"
-        version: v6.6.0
+- name: Download libvirt source codes
+  git:
+    repo: https://github.com/libvirt/libvirt.git
+    dest: "{{ lookup('env','HOME') }}/sources/libvirt"
+    version: v6.6.0
 
-    - name: Download qemu source codes
-      git:
-        repo: https://github.com/qemu/qemu.git
-        dest: "{{ lookup('env','HOME') }}/sources/qemu"
-        version: v5.1.0
+- name: Download qemu source codes
+  git:
+    repo: https://github.com/qemu/qemu.git
+    dest: "{{ lookup('env','HOME') }}/sources/qemu"
+    version: v5.1.0
 
-    - name: Compile and install vdsm
-      shell: |
-        cd "{{ lookup('env','HOME') }}/sources/vdsm"
-        yum update -y
-        yum install -y `cat automation/check-patch.packages.el7`
-        easy_install pip
-        python2 -m pip install --upgrade pip
-        python2 -m pip install nose==1.3.7 tox==3.14 yappi==0.93 mock
-        ./autogen.sh --system
-        make
-        rm -rf ~/rpmbuild/RPMS/*/vdsm*.rpm
-        make rpm
-        cd ~/rpmbuild/RPMS
-        yum remove -y vdsm*
-        yum install -y */vdsm*.rpm
+- name: Compile and install vdsm
+  shell: |
+    cd "{{ lookup('env','HOME') }}/sources/vdsm"
+    yum update -y
+    yum install -y `cat automation/check-patch.packages.el7`
+    easy_install pip
+    python2 -m pip install --upgrade pip
+    python2 -m pip install nose==1.3.7 tox==3.14 yappi==0.93 mock
+    ./autogen.sh --system
+    make
+    rm -rf ~/rpmbuild/RPMS/*/vdsm*.rpm
+    make rpm
+    cd ~/rpmbuild/RPMS
+    yum remove -y vdsm*
+    yum install -y */vdsm*.rpm
 
-    - name: Compile and install qemu
-      shell: |
-        cd "{{ lookup('env','HOME') }}/sources/qemu"
-        ./configure --target-list=x86_64-softmmu --prefix=/usr
-        make -j`nproc`
-        make install
-        ln -sf /usr/bin/qemu-system-x86_64 /usr/bin/qemu-kvm
-        ln -sf /usr/bin/qemu-system-x86_64 /usr/libexec/qemu-kvm
+- name: Compile and install qemu
+  shell: |
+    cd "{{ lookup('env','HOME') }}/sources/qemu"
+    ./configure --target-list=x86_64-softmmu --prefix=/usr
+    make -j`nproc`
+    make install
+    ln -sf /usr/bin/qemu-system-x86_64 /usr/bin/qemu-kvm
+    ln -sf /usr/bin/qemu-system-x86_64 /usr/libexec/qemu-kvm
 
-    - name: Comple and install virt-manager
-      shell: |
-        cd "{{ lookup('env','HOME') }}/sources/virt-manager"
-        ./setup.py install
+- name: Comple and install virt-manager
+  shell: |
+    cd "{{ lookup('env','HOME') }}/sources/virt-manager"
+    ./setup.py install
 
-    - name: Compile and install libvirt
-      shell: |
-        cd "{{ lookup('env','HOME') }}/sources/libvirt"
-        mkdir -p build
-        cd build
-        ../autogen.sh --system
-        ../configure --prefix=/usr --with-qemu-user=root --with-qemu-group=root --with-esx=no --with-vbox=no --with-xen=no --with-vmware=no --with-openvz=no --with-lxc=no --with-uml=no --with-sasl=yes --with-yajl=yes --with-pciaccess=yes --with-gnutls=yes --with-numactl=no  --with-sanlock=yes
-        make
-        make install
-        ldconfig
-        cp -a /usr/lib/systemd/system/libvirtd.service /etc/systemd/system/libvirtd.service
-        systemctl mask libvirtd.socket libvirtd-ro.socket libvirtd-admin.socket libvirtd-tls.socket libvirtd-tcp.socket
+- name: Compile and install libvirt
+  shell: |
+    cd "{{ lookup('env','HOME') }}/sources/libvirt"
+    mkdir -p build
+    cd build
+    ../autogen.sh --system
+    ../configure --prefix=/usr --with-qemu-user=root --with-qemu-group=root --with-esx=no --with-vbox=no --with-xen=no --with-vmware=no --with-openvz=no --with-lxc=no --with-uml=no --with-sasl=yes --with-yajl=yes --with-pciaccess=yes --with-gnutls=yes --with-numactl=no  --with-sanlock=yes
+    make
+    make install
+    ldconfig
+    cp -a /usr/lib/systemd/system/libvirtd.service /etc/systemd/system/libvirtd.service
+    systemctl mask libvirtd.socket libvirtd-ro.socket libvirtd-admin.socket libvirtd-tls.socket libvirtd-tcp.socket
 
-    - name: Configure vdsm
-      shell: |
-        cd "{{ lookup('env','HOME') }}/sources/vdsm"
-        vdsm-tool configure --force
+- name: Configure vdsm
+  shell: |
+    cd "{{ lookup('env','HOME') }}/sources/vdsm"
+    vdsm-tool configure --force
 
-    - name: Start service libvirtd
-      service:
-        name: libvirtd
-        state: started
-    - name: Start service vdsm
-      service:
-        name: vdsmd
-        state: started
+- name: Start service libvirtd
+  service:
+    name: libvirtd
+    state: started
+
+- name: Start service vdsm
+  service:
+    name: vdsmd
+    state: started

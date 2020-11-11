@@ -1,4 +1,6 @@
 - hosts: 127.0.0.1
   connection: local
+  become: true
   roles:
-    - { role: nfs-server, become: yes }
+    - vdsm
+    - nfs_server
