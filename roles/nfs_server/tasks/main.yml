@@ -1,0 +1,16 @@
+- name: Install NFS server
+  tags:
+    - nfs_server
+  yum:
+    name:
+      - nfs-utils
+    state: installed
+
+- name: Start NFS server service
+  action: service name={{item}} state=started
+  tags:
+    - nfs_server
+  with_items:
+    - rpcbind
+    - nfslock
+    - nfs

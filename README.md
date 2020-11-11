@@ -14,5 +14,5 @@ ansible-lint /path/to/your/playbook
 
 ## Run
 ```
-ansible-playbook /path/to/your/playbook
+ansible-playbook --ask-become-pass /path/to/your/playbook
 ```
