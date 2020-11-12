@@ -1,23 +1,25 @@
 - name: Install NFS server
-  when: ansible_distribution == 'CentOS'
   tags:
     - nfs_server
+  when: ansible_distribution == 'CentOS'
   yum:
     name:
       - nfs-utils
     state: installed
 
 - name: Start NFS server service
-  when: ansible_distribution == 'CentOS'
-  action: service name={{item}} state=started
   tags:
     - nfs_server
+  when: ansible_distribution == 'CentOS'
+  action: service name={{item}} state=started
   with_items:
     - rpcbind
     - nfslock
     - nfs
 
 - name: Add ports to firewalld
+  tags:
+    - nfs_server
   when: ansible_distribution == 'CentOS'
   firewalld:
     service: "{{ item }}"
@@ -27,3 +29,6 @@
     - nfs
     - nfs3
     - rpc-bind
+
+- name: Reload firewalld
+  service: name=firewalld state=restarted
