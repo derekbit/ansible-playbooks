@@ -1,0 +1,6 @@
+- name: Configure SELinux disabled permanently
+  when: ansible_distribution == 'CentOS'
+  ansible.posix.selinux:
+    configfile: /etc/selinux/config
+    policy: targeted
+    state: disabled

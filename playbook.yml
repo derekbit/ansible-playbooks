@@ -4,3 +4,4 @@
   roles:
     - vdsm
     - nfs_server
+    - selinux

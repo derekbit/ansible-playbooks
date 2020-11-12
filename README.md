@@ -3,8 +3,10 @@
 ## Install
 - CentOS 7
 ```
-sudo yum install -y epel-release
-sudo yum install -y ansible ansible-lint
+yum install -y epel-release
+yum install -y ansible ansible-lint
+
+ansible-galaxy collection install ansible.posix
 ```
 
 ## How To Check Playbooks
